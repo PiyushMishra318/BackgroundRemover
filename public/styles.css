@@ -51,3 +51,21 @@ footer {
 .header__github:hover {
   text-decoration: underline;
 }
+
+/* --- portfolio theme: dark mode + animated bg --- */
+:root,[data-theme="light"]{color-scheme:light;--card:var(--surface,#fff)}
+[data-theme="dark"]{color-scheme:dark}
+:root{--card:var(--surface,#fff)}
+.card{background:var(--card)}
+.bg-animation{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+body>*:not(.bg-animation){position:relative;z-index:1}
+.header,header.header,.site-header{background:color-mix(in srgb,var(--bg) 88%,transparent)!important;backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+.site-footer,.footer,footer{background:color-mix(in srgb,var(--bg) 92%,transparent)}
+.theme-toggle{position:absolute;top:1rem;right:1rem;z-index:110;width:2.5rem;height:2.5rem;border-radius:50%;border:1px solid var(--border,#334155);background:var(--card,var(--surface,#fff));color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:1.1rem;padding:0;box-shadow:0 2px 8px rgb(0 0 0/12%);transition:transform .2s ease,border-color .2s}
+.theme-toggle:hover{transform:scale(1.06);border-color:var(--accent)}
+.header,.header__inner{position:relative}
+[data-theme=light] .theme-toggle__icon--moon,[data-theme=dark] .theme-toggle__icon--sun{display:none}
+[data-theme=light]{--bg:#f4f6f8;--text:#0f172a;--card:#fff;--surface:#fff;--border:#e2e8f0;--muted:#64748b}
+[data-theme=dark]{--bg:#0f1419;--text:#e7ecf3;--card:#1a222d;--surface:#1a222d;--border:#2a3441;--muted:#9aa8b8}
+
+body.theme-cutout .bg-animation{background:linear-gradient(160deg,color-mix(in srgb,var(--accent) 15%,transparent),transparent 45%),linear-gradient(20deg,color-mix(in srgb,#ec4899 12%,transparent),transparent 40%);animation:cs 12s alternate infinite}body.theme-cutout .bg-animation::after{content:"";inset:20%;position:absolute;border:2px solid color-mix(in srgb,var(--accent) 25%,transparent);border-radius:24% 76% 35% 65%/55% 42% 58% 45%;animation:cm 10s infinite}@keyframes cs{to{filter:brightness(1.15)}}@keyframes cm{50%{border-radius:60% 40% 50% 50%/45% 55% 45% 55%}}
