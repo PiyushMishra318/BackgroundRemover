@@ -19,9 +19,9 @@ jobs:
         shell: pwsh
         run: |
           choco install opencv -y --no-progress
-          $opencvDir = Get-ChildItem -Path C:	ools -Filter OpenCV* -Directory | Select-Object -First 1
-          if (-not $opencvDir) { throw 'OpenCV install directory not found under C:	ools' }
-          "OpenCV_DIR=$($opencvDir.FullName)uild" >> $env:GITHUB_ENV
+          $opencvDir = Get-ChildItem -Path C:/tools -Filter OpenCV* -Directory | Select-Object -First 1
+          if (-not $opencvDir) { throw 'OpenCV install directory not found under C:/tools' }
+          "OpenCV_DIR=$($opencvDir.FullName)/build" >> $env:GITHUB_ENV
 
       - name: Configure
         run: cmake -B build -S . -DOpenCV_DIR="$env:OpenCV_DIR"
@@ -32,7 +32,7 @@ jobs:
       - name: Stage release binary
         run: |
           mkdir release
-          copy build\Releaseg-cutout.exe releaseg-cutout-windows-x64.exe
+          copy build/Release/bg-cutout.exe release/bg-cutout-windows-x64.exe
 
       - name: Upload release asset
         uses: softprops/action-gh-release@v2
