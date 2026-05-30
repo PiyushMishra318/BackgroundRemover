@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Remove solid backgrounds with grayscale thresholding — C++ and Python CLIs." />
+  <title>Threshold Background Cutout</title>
+  <link rel="stylesheet" href="/styles.css" />
+</head>
+<body>
+  <header class="header"><div class="header__inner">
+    <span class="badge">C++ · Python · OpenCV</span>
+    <h1>Threshold Background Cutout</h1>
+    <p>Remove a solid background from an image using grayscale thresholding, then write a BGRA PNG with an alpha mask.</p>
+  </div></header>
+  <main class="main">
+    <section class="card">
+      <h2>Download Windows build</h2>
+      <p>Pre-built <code>bg-cutout-windows-x64.exe</code> from the latest GitHub release — no OpenCV install required.</p>
+      <div class="actions">
+        <a class="btn" href="https://github.com/PiyushMishra318/Threshold-Background-Cutout/releases/download/v2.0.0/bg-cutout-windows-x64.exe">Download v2.0.0</a>
+        <a class="btn btn--ghost" href="https://github.com/PiyushMishra318/Threshold-Background-Cutout/releases">All releases</a>
+      </div>
+    </section>
+    <section class="card">
+      <h2>Usage</h2>
+      <pre>bg-cutout-windows-x64.exe input.jpg output.png --threshold 240
+# Python CLI
+bg-cutout-py input.jpg output.png --threshold 240</pre>
+      <p>Build from source with CMake (C++) or <code>pip install -e python/</code> for the Python entry point.</p>
+    </section>
+  </main>
+  <footer class="footer"><p>MIT © 2026 · <a href="https://piyushm.dev">piyushm.dev</a></p></footer>
+</body>
+</html>
