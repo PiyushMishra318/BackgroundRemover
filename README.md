@@ -1,4 +1,4 @@
-# Threshold Background Cutout
+# Threshold-Background-Cutout
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![C++](https://img.shields.io/badge/C%2B%2B-17-blue.svg)](CMakeLists.txt)
@@ -25,8 +25,8 @@ Dual CLIs share the same pipeline: a fast **C++** binary (`bg-cutout`) and a por
 ## Build (C++)
 
 ```bash
-git clone git@github.com:PiyushMishra318/BackgroundRemover.git
-cd BackgroundRemover
+git clone git@github.com:PiyushMishra318/Threshold-Background-Cutout.git
+cd Threshold-Background-Cutout
 cmake -B build -S .
 cmake --build build
 ```
@@ -41,7 +41,7 @@ cmake -B build -S .
 cmake --build build --config Release
 ```
 
-Prebuilt Windows binaries are attached to [GitHub Releases](https://github.com/PiyushMishra318/BackgroundRemover/releases) as `bg-cutout-windows-x64.exe`.
+Prebuilt Windows binaries are attached to [GitHub Releases](https://github.com/PiyushMishra318/Threshold-Background-Cutout/releases) as `bg-cutout-windows-x64.exe`.
 
 ### OpenCV on Ubuntu
 
