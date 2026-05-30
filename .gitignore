@@ -1,32 +1,20 @@
-# Prerequisites
-*.d
+.venv/
+.pytest_cache/
+python/*.egg-info/
+build/
 .vs/
-# Compiled Object files
-*.slo
-*.lo
-*.o
+*.user
+*.suo
 *.obj
-
-# Precompiled Headers
-*.gch
-*.pch
-
-# Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
-
-# Fortran module files
-*.mod
-*.smod
-
-# Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
-
-# Executables
+*.o
 *.exe
-*.out
-*.app
+*.pdb
+*.ilk
+*.log
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+output.png
+!fixtures/
+!fixtures/**

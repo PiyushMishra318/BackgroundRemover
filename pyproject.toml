@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "threshold-bg-cutout"
+version = "2.0.0"
+description = "Remove solid image backgrounds using grayscale thresholding"
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Piyush Mishra", email = "piyush_mishra31@outlook.com" }]
+dependencies = [
+  "opencv-python-headless>=4.10.0,<5",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0"]
+
+[project.scripts]
+bg-cutout-py = "background_remover:main"
+
+[tool.setuptools]
+py-modules = ["background_remover"]
+package-dir = { "" = "python" }
+
+[tool.pytest.ini_options]
+pythonpath = ["python"]
+testpaths = ["tests"]
