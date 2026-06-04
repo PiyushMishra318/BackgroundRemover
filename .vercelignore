@@ -1,0 +1,12 @@
+src/
+python/
+tests/
+fixtures/
+build/
+.github/
+CMakeLists.txt
+requirements.txt
+requirements-dev.txt
+pyproject.toml
+README.md
+LICENSE

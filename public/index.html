@@ -2,39 +2,159 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <meta name="description" content="Remove solid backgrounds with grayscale thresholding — C++ and Python CLIs." />
-  <title>Threshold Background Cutout</title>
-  <link rel="stylesheet" href="/styles.css" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Threshold — solid backgrounds to transparent PNGs</title>
+  <meta name="description" content="Remove a solid background with grayscale thresholding — fast C++ and Python CLIs, Windows binary, BGRA PNG output." />
+  <meta name="theme-color" content="#05070c" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Syne:wght@600;800&family=Karla:ital,wght@0,400;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap" />
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body class="theme-cutout">
   <div class="bg-animation" aria-hidden="true"></div>
-  <header class="header">
-    <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Toggle color theme" title="Toggle theme"><span class="theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true">&#9728;</span><span class="theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true">&#9789;</span></button><div class="header__inner">
-    <span class="badge">C++ · Python · OpenCV</span>
-    <h1>Threshold Background Cutout</h1>
-    <p>Remove a solid background from an image using grayscale thresholding, then write a BGRA PNG with an alpha mask.</p>
-  
-      <a class="header__github" href="https://github.com/PiyushMishra318/Threshold-Background-Cutout" target="_blank" rel="noopener noreferrer">View on GitHub</a>
-    </div></header>
-  <main class="page-main main">
-    <section class="card">
-      <h2>Download Windows build</h2>
-      <p>Pre-built <code>bg-cutout-windows-x64.exe</code> from the latest GitHub release — no OpenCV install required.</p>
-      <div class="actions">
-        <a class="btn" href="https://github.com/PiyushMishra318/Threshold-Background-Cutout/releases/download/v2.0.0/bg-cutout-windows-x64.exe">Download v2.0.0</a>
-        <a class="btn btn--ghost" href="https://github.com/PiyushMishra318/Threshold-Background-Cutout/releases">All releases</a>
+  <div class="grain" aria-hidden="true"></div>
+
+  <nav class="site-nav" aria-label="Site">
+    <a class="site-nav__brand" href="https://piyushm.dev">piyushm.dev</a>
+    <button type="button" id="theme-toggle" class="theme-toggle" aria-label="Toggle color theme" title="Toggle theme">
+      <span class="theme-toggle__icon theme-toggle__icon--sun" aria-hidden="true">&#9728;</span>
+      <span class="theme-toggle__icon theme-toggle__icon--moon" aria-hidden="true">&#9789;</span>
+    </button>
+  </nav>
+
+  <header class="hero">
+    <p class="hero__kicker">C++ · Python · OpenCV</p>
+    <h1 class="hero__title"><span class="hero__title-accent">Threshold</span> Background Cutout</h1>
+    <p class="hero__tagline">Turn a flat-color backdrop into a clean alpha mask — one threshold, a BGRA PNG, and you&apos;re done.</p>
+    <div class="hero__actions">
+      <a class="btn btn-primary" href="https://github.com/PiyushMishra318/Threshold-Background-Cutout/releases/download/v2.0.0/bg-cutout-windows-x64.exe" id="exe-link">Download for Windows</a>
+      <a class="btn btn-secondary" href="https://github.com/PiyushMishra318/Threshold-Background-Cutout" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+    </div>
+  </header>
+
+  <section class="cutout-preview" aria-label="Cutout pipeline preview">
+    <div class="cutout-preview__frame">
+      <div class="cutout-preview__toolbar">
+        <span class="cutout-preview__dot" aria-hidden="true"></span>
+        <span class="cutout-preview__dot" aria-hidden="true"></span>
+        <span class="cutout-preview__dot" aria-hidden="true"></span>
+        <span class="cutout-preview__title">bg-cutout — preview</span>
+      </div>
+      <div class="cutout-preview__stage">
+        <div class="cutout-panel cutout-panel--before">
+          <span class="cutout-panel__label">Input</span>
+          <div class="cutout-panel__scene cutout-panel__scene--screen">
+            <span class="cutout-subject" aria-hidden="true"></span>
+          </div>
+        </div>
+        <div class="cutout-preview__arrow" aria-hidden="true">→</div>
+        <div class="cutout-panel cutout-panel--after">
+          <span class="cutout-panel__label">Output</span>
+          <div class="cutout-panel__scene cutout-panel__scene--alpha">
+            <span class="cutout-subject cutout-subject--cut" aria-hidden="true"></span>
+          </div>
+        </div>
+      </div>
+      <div class="cutout-preview__slider" aria-hidden="true">
+        <span class="cutout-preview__slider-label">Threshold</span>
+        <span class="cutout-preview__track"><span class="cutout-preview__fill"></span><span class="cutout-preview__thumb"></span></span>
+        <span class="cutout-preview__value">240</span>
+      </div>
+    </div>
+    <p class="cutout-preview__caption">Grayscale threshold → alpha channel → transparent PNG</p>
+  </section>
+
+  <main class="page-main">
+    <section class="benefits" aria-labelledby="benefits-heading">
+      <h2 id="benefits-heading" class="section-kicker">Why Threshold</h2>
+      <ul class="benefit-strip">
+        <li class="benefit-strip__item">
+          <span class="benefit-strip__icon" aria-hidden="true">◐</span>
+          <strong>One knob, clear mask</strong>
+          <span>Pick a threshold 0–255; pixels above or below become your alpha — invert when the backdrop is dark.</span>
+        </li>
+        <li class="benefit-strip__item">
+          <span class="benefit-strip__icon" aria-hidden="true">⬡</span>
+          <strong>Windows build ready</strong>
+          <span>Grab <code>bg-cutout-windows-x64.exe</code> from Releases — no local OpenCV install required.</span>
+        </li>
+        <li class="benefit-strip__item">
+          <span class="benefit-strip__icon" aria-hidden="true">⇄</span>
+          <strong>Same pipeline, two CLIs</strong>
+          <span>Fast C++ binary or portable <code>bg-cutout-py</code> — identical BGRA PNG output.</span>
+        </li>
+      </ul>
+    </section>
+
+    <section class="moments" aria-labelledby="moments-heading">
+      <h2 id="moments-heading" class="section-kicker">How it works</h2>
+      <article class="moment">
+        <div class="moment__copy">
+          <h3>Load, grayscale, threshold</h3>
+          <p>OpenCV reads your image, converts to grayscale, and applies a binary threshold to build the alpha mask.</p>
+        </div>
+        <div class="moment__visual moment__visual--pipeline" aria-hidden="true">
+          <span class="pipe-step"><em>1</em> BGR image</span>
+          <span class="pipe-step pipe-step--active"><em>2</em> Grayscale + threshold</span>
+          <span class="pipe-step"><em>3</em> Alpha mask</span>
+        </div>
+      </article>
+      <article class="moment moment--reverse">
+        <div class="moment__copy">
+          <h3>Export BGRA with transparency</h3>
+          <p>Blue, green, red, and alpha merge into a PNG you can drop into slides, thumbnails, or compositing workflows.</p>
+        </div>
+        <div class="moment__visual moment__visual--terminal" aria-hidden="true">
+          <code class="term-line">bg-cutout input.jpg out.png -t 240</code>
+          <code class="term-line term-line--muted">bg-cutout-py -i photo.jpg -o cut.png --invert</code>
+        </div>
+      </article>
+    </section>
+
+    <section class="install" aria-labelledby="install-heading">
+      <div class="install__inner">
+        <h2 id="install-heading">Get the Windows build</h2>
+        <p>Pre-built executable from the latest GitHub release — or build from source with CMake and OpenCV.</p>
+        <div class="install__actions">
+          <a class="btn btn-primary btn--lg" href="https://github.com/PiyushMishra318/Threshold-Background-Cutout/releases/download/v2.0.0/bg-cutout-windows-x64.exe" id="exe-link-cta">Download latest .exe</a>
+          <a class="btn btn-secondary" href="https://github.com/PiyushMishra318/Threshold-Background-Cutout/releases">All releases</a>
+        </div>
       </div>
     </section>
-    <section class="card">
-      <h2>Usage</h2>
-      <pre>bg-cutout-windows-x64.exe input.jpg output.png --threshold 240
-# Python CLI
-bg-cutout-py input.jpg output.png --threshold 240</pre>
-      <p>Build from source with CMake (C++) or <code>pip install -e python/</code> for the Python entry point.</p>
+
+    <section class="usage" aria-labelledby="usage-heading">
+      <h2 id="usage-heading" class="section-kicker">Usage</h2>
+      <div class="usage__card">
+        <pre class="usage__pre"><code>bg-cutout-windows-x64.exe input.jpg output.png --threshold 240
+bg-cutout-py input.jpg output.png --threshold 240</code></pre>
+        <p class="usage__note">Build C++ with CMake, or <code>pip install -e .</code> for the Python entry point. See the repo README for flags like <code>--invert</code> and <code>--preview</code>.</p>
+      </div>
     </section>
   </main>
-  <footer class="site-footer footer"><p>MIT © 2026 · <a href="https://piyushm.dev">piyushm.dev</a> · <a href="https://github.com/PiyushMishra318/Threshold-Background-Cutout" target="_blank" rel="noopener noreferrer">View on GitHub</a></p></footer>
-  <script src="/theme.js"></script>
+
+  <footer class="site-footer">
+    <p>MIT © 2026 · <a href="https://piyushm.dev">piyushm.dev</a> · <a href="https://github.com/PiyushMishra318/Threshold-Background-Cutout">GitHub</a> · <a href="https://github.com/PiyushMishra318/Threshold-Background-Cutout#readme">For developers</a></p>
+  </footer>
+
+  <script>
+    fetch("https://api.github.com/repos/PiyushMishra318/Threshold-Background-Cutout/releases/latest")
+      .then(function (r) { return r.ok ? r.json() : null; })
+      .then(function (rel) {
+        if (!rel || !rel.assets) return;
+        var exe = rel.assets.find(function (a) {
+          return a.name && a.name.endsWith(".exe");
+        });
+        var url = exe ? exe.browser_download_url : rel.html_url;
+        var links = document.querySelectorAll("#exe-link, #exe-link-cta");
+        for (var i = 0; i < links.length; i++) links[i].href = url;
+        if (exe && rel.tag_name) {
+          var label = document.querySelector(".install__inner .btn--lg");
+          if (label) label.textContent = "Download " + rel.tag_name.replace(/^v/, "v");
+        }
+      })
+      .catch(function () {});
+  </script>
+  <script src="theme.js"></script>
 </body>
 </html>
