@@ -1,13 +1,18 @@
 {
   "framework": null,
   "buildCommand": "",
-  "installCommand": "pip install -r requirements.txt -r api/requirements.txt",
+  "installCommand": "npm install",
   "outputDirectory": "public",
+  "rewrites": [
+    {
+      "source": "/products/threshold/api/:path*",
+      "destination": "/api/:path*"
+    }
+  ],
   "functions": {
-    "api/cutout.py": {
+    "api/cutout.js": {
       "maxDuration": 30,
-      "memory": 1024,
-      "includeFiles": "python/**"
+      "memory": 1024
     }
   }
 }
