@@ -1,12 +1,13 @@
 {
   "framework": null,
   "buildCommand": "",
-  "installCommand": "npm install",
+  "installCommand": "pip install -r requirements.txt -r api/requirements.txt",
   "outputDirectory": "public",
   "functions": {
-    "api/cutout.js": {
+    "api/cutout.py": {
       "maxDuration": 30,
-      "memory": 1024
+      "memory": 1024,
+      "includeFiles": "python/**"
     }
   }
 }

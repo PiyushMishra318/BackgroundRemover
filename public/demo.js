@@ -1,8 +1,30 @@
 (function () {
   "use strict";
 
-  var API = "/api/cutout";
-  var SAMPLE = "assets/sample.jpg";
+  function resolveApiUrl() {
+    var path = window.location.pathname;
+    var base = path;
+    if (!base.endsWith("/")) {
+      var last = base.split("/").pop();
+      if (last && last.indexOf(".") >= 0) {
+        base = base.slice(0, base.lastIndexOf("/") + 1);
+      } else {
+        base = base + "/";
+      }
+    }
+    if (base === "/") return "/api/cutout";
+    return base + "api/cutout";
+  }
+
+  function resolveApi() {
+    return resolveApiUrl();
+  }
+
+  function assetUrl(path) {
+    return new URL(path, window.location.href).href;
+  }
+
+  var SAMPLE = assetUrl("assets/sample.jpg");
   var MAX_FILE_BYTES = 10 * 1024 * 1024;
 
   var root = document.getElementById("workbench");
@@ -42,8 +64,20 @@
     state.objectUrls = [];
   }
 
+  function revokeTracked(keep) {
+    var next = [];
+    state.objectUrls.forEach(function (u) {
+      if (keep && u === keep) {
+        next.push(u);
+        return;
+      }
+      URL.revokeObjectURL(u);
+    });
+    state.objectUrls = next;
+  }
+
   function trackUrl(url) {
-    state.objectUrls.push(url);
+    if (state.objectUrls.indexOf(url) < 0) state.objectUrls.push(url);
     return url;
   }
 
@@ -104,7 +138,12 @@
   }
 
   function applySource(url, label) {
-    revokeAll();
+    if (url && url.startsWith("blob:")) {
+      revokeTracked(url);
+      trackUrl(url);
+    } else {
+      revokeAll();
+    }
     state.sourceUrl = url;
     state.sourceName = label || "input.jpg";
     state.resultBlob = null;
@@ -125,7 +164,7 @@
   }
 
   async function fetchCutout(base64, threshold, invert) {
-    var res = await fetch(API, {
+    var res = await fetch(resolveApi(), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -134,7 +173,21 @@
         invert: invert,
       }),
     });
-    var data = await res.json();
+    var ctype = (res.headers.get("Content-Type") || "").toLowerCase();
+    var bodyText = await res.text();
+    if (!ctype.includes("application/json")) {
+      throw new Error(
+        res.ok
+          ? "Unexpected server response."
+          : "Cutout service unavailable — try again or use the CLI."
+      );
+    }
+    var data;
+    try {
+      data = JSON.parse(bodyText);
+    } catch (parseErr) {
+      throw new Error("Invalid response from cutout service.");
+    }
     if (!res.ok) {
       throw new Error(data.error || "Server error");
     }
@@ -211,8 +264,7 @@
       return;
     }
     state.sourceFile = file;
-    var url = trackUrl(URL.createObjectURL(file));
-    applySource(url, file.name);
+    applySource(URL.createObjectURL(file), file.name);
   }
 
   function onDrop(e) {
