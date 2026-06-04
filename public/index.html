@@ -28,41 +28,82 @@
     <h1 class="hero__title"><span class="hero__title-accent">Threshold</span> Background Cutout</h1>
     <p class="hero__tagline">Turn a flat-color backdrop into a clean alpha mask — one threshold, a BGRA PNG, and you&apos;re done.</p>
     <div class="hero__actions">
-      <a class="btn btn-primary" href="https://github.com/PiyushMishra318/Threshold-Background-Cutout/releases/download/v2.0.0/bg-cutout-windows-x64.exe" id="exe-link">Download for Windows</a>
+      <a class="btn btn-primary" href="#try-it">Try it live</a>
+      <a class="btn btn-secondary" href="https://github.com/PiyushMishra318/Threshold-Background-Cutout/releases/download/v2.0.0/bg-cutout-windows-x64.exe" id="exe-link">Download for Windows</a>
       <a class="btn btn-secondary" href="https://github.com/PiyushMishra318/Threshold-Background-Cutout" target="_blank" rel="noopener noreferrer">View on GitHub</a>
     </div>
   </header>
 
-  <section class="cutout-preview" aria-label="Cutout pipeline preview">
-    <div class="cutout-preview__frame">
+  <section id="try-it" class="demo cutout-preview" aria-labelledby="demo-heading" data-has-result="false">
+    <h2 id="demo-heading" class="demo__heading section-kicker">Try it live</h2>
+    <p class="demo__lede">Upload an image — the same OpenCV threshold pipeline as <code>bg-cutout-py</code> runs on the server and returns a BGRA PNG.</p>
+
+    <div class="demo__frame cutout-preview__frame">
       <div class="cutout-preview__toolbar">
         <span class="cutout-preview__dot" aria-hidden="true"></span>
         <span class="cutout-preview__dot" aria-hidden="true"></span>
         <span class="cutout-preview__dot" aria-hidden="true"></span>
-        <span class="cutout-preview__title">bg-cutout — preview</span>
+        <span class="cutout-preview__title">bg-cutout — live</span>
+        <span class="demo__filename" aria-live="polite">sample.jpg</span>
       </div>
-      <div class="cutout-preview__stage">
-        <div class="cutout-panel cutout-panel--before">
-          <span class="cutout-panel__label">Input</span>
-          <div class="cutout-panel__scene cutout-panel__scene--screen">
-            <span class="cutout-subject" aria-hidden="true"></span>
+
+      <div
+        class="demo__dropzone"
+        role="button"
+        tabindex="0"
+        aria-label="Drop an image here or activate to choose a file"
+      >
+        <input type="file" id="demo-file" class="demo__file-input" accept="image/jpeg,image/png,image/webp" hidden />
+        <p class="demo__dropzone-text"><span class="demo__dropzone-icon" aria-hidden="true">↓</span> Drop image or click to browse</p>
+        <button type="button" class="demo__sample-btn" id="demo-sample">Use sample photo</button>
+      </div>
+
+      <div class="demo__stage cutout-preview__stage" data-state="idle" style="--compare: 50%">
+        <div class="demo__layer demo__layer--before">
+          <span class="cutout-panel__label">Before</span>
+          <div class="demo__viewport demo__viewport--screen">
+            <img class="demo__img demo__img--before" src="assets/sample.jpg" alt="Original image before background removal" width="320" height="400" />
+            <div class="demo__shimmer" aria-hidden="true"></div>
+            <div class="demo__scan" aria-hidden="true"></div>
           </div>
         </div>
-        <div class="cutout-preview__arrow" aria-hidden="true">→</div>
-        <div class="cutout-panel cutout-panel--after">
-          <span class="cutout-panel__label">Output</span>
-          <div class="cutout-panel__scene cutout-panel__scene--alpha">
-            <span class="cutout-subject cutout-subject--cut" aria-hidden="true"></span>
+        <div class="demo__layer demo__layer--after" aria-hidden="true">
+          <span class="cutout-panel__label">After</span>
+          <div class="demo__viewport demo__viewport--alpha">
+            <img class="demo__img demo__img--after" alt="Cutout with transparent background" hidden />
           </div>
         </div>
+        <div class="demo__wipe" aria-hidden="true"></div>
+        <div class="demo__handle" aria-hidden="true"></div>
       </div>
-      <div class="cutout-preview__slider" aria-hidden="true">
-        <span class="cutout-preview__slider-label">Threshold</span>
-        <span class="cutout-preview__track"><span class="cutout-preview__fill"></span><span class="cutout-preview__thumb"></span></span>
-        <span class="cutout-preview__value">240</span>
+
+      <label class="demo__compare" for="demo-compare">
+        <span class="demo__compare-label">Compare</span>
+        <input type="range" id="demo-compare" class="demo__compare-range" min="0" max="100" value="50" disabled aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" />
+      </label>
+
+      <div class="demo__controls">
+        <div class="demo__control demo__control--threshold">
+          <label for="demo-threshold">
+            <span class="cutout-preview__slider-label">Threshold</span>
+            <span class="cutout-preview__value" id="demo-threshold-value">100</span>
+          </label>
+          <input type="range" id="demo-threshold" class="demo__threshold-range" min="0" max="255" value="100" />
+        </div>
+        <label class="demo__invert">
+          <input type="checkbox" id="demo-invert" />
+          <span>Invert mask</span>
+          <span class="demo__invert-hint">(dark backgrounds)</span>
+        </label>
       </div>
+
+      <div class="demo__actions">
+        <button type="button" class="btn btn-primary" id="demo-process">Cut out background</button>
+        <button type="button" class="btn btn-secondary" id="demo-download" disabled>Download PNG</button>
+      </div>
+      <p class="demo__status cutout-preview__caption" role="status">Loading sample…</p>
     </div>
-    <p class="cutout-preview__caption">Grayscale threshold → alpha channel → transparent PNG</p>
+    <p class="cutout-preview__caption">Grayscale threshold → alpha channel → transparent PNG · powered by <code>python/background_remover.py</code></p>
   </section>
 
   <main class="page-main">
@@ -156,5 +197,6 @@ bg-cutout-py input.jpg output.png --threshold 240</code></pre>
       .catch(function () {});
   </script>
   <script src="theme.js"></script>
+  <script src="demo.js" defer></script>
 </body>
 </html>

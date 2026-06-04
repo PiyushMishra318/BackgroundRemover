@@ -809,10 +809,396 @@ a:focus-visible,
   }
 }
 
+/* Live demo — Canva-style processing & reveal */
+.demo {
+  animation: rise-in 0.9s cubic-bezier(0.22, 1, 0.36, 1) 0.12s backwards;
+}
+
+.demo__heading {
+  text-align: center;
+  margin-bottom: 0.35rem;
+}
+
+.demo__lede {
+  margin: 0 auto 1.25rem;
+  max-width: 52ch;
+  text-align: center;
+  font-size: 0.95rem;
+  color: var(--muted);
+}
+
+.demo__lede code {
+  font-family: var(--font-mono);
+  font-size: 0.88em;
+  color: var(--text);
+}
+
+.demo__frame {
+  max-width: min(520px, 100%);
+}
+
+.demo__filename {
+  margin-left: auto;
+  font-family: var(--font-mono);
+  font-size: 0.58rem;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  max-width: 42%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.demo__dropzone {
+  margin: 0 0.75rem;
+  padding: 0.85rem 1rem;
+  border-radius: 10px;
+  border: 1px dashed color-mix(in srgb, var(--accent) 45%, var(--border));
+  background: color-mix(in srgb, var(--void) 40%, var(--surface));
+  text-align: center;
+  cursor: pointer;
+  transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+}
+
+.demo__dropzone:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.demo__dropzone--hover,
+.demo__dropzone:hover {
+  border-color: var(--accent);
+  box-shadow: var(--shadow-glow);
+  background: color-mix(in srgb, var(--accent) 6%, var(--surface));
+}
+
+.demo__dropzone-text {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: 0.68rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.demo__dropzone-icon {
+  display: inline-block;
+  margin-right: 0.35rem;
+  color: var(--accent);
+  animation: bob 2s ease-in-out infinite;
+}
+
+.demo__sample-btn {
+  margin-top: 0.5rem;
+  padding: 0.35rem 0.75rem;
+  border: none;
+  border-radius: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 12%, transparent);
+  cursor: pointer;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.demo__sample-btn:hover {
+  background: color-mix(in srgb, var(--accent) 22%, transparent);
+  transform: translateY(-1px);
+}
+
+.demo__stage {
+  position: relative;
+  display: block;
+  margin: 0.75rem;
+  border-radius: 10px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+  aspect-ratio: 4 / 5;
+  max-height: 420px;
+  background: var(--panel);
+}
+
+.demo__layer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  padding: 0.5rem;
+}
+
+.demo__layer .cutout-panel__label {
+  z-index: 3;
+  margin-bottom: 0.25rem;
+}
+
+.demo__viewport {
+  position: relative;
+  flex: 1;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.demo__viewport--screen {
+  background: linear-gradient(145deg, var(--screen-bright), var(--screen));
+}
+
+.demo__viewport--alpha {
+  background-color: var(--checker);
+  background-image:
+    linear-gradient(45deg, var(--checker-alt) 25%, transparent 25%),
+    linear-gradient(-45deg, var(--checker-alt) 25%, transparent 25%),
+    linear-gradient(45deg, transparent 75%, var(--checker-alt) 75%),
+    linear-gradient(-45deg, transparent 75%, var(--checker-alt) 75%);
+  background-size: 14px 14px;
+  background-position: 0 0, 0 7px, 7px -7px, -7px 0;
+}
+
+.demo__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: center bottom;
+}
+
+.demo__layer--before {
+  z-index: 1;
+}
+
+.demo__layer--after {
+  z-index: 2;
+  clip-path: inset(0 0 0 var(--compare, 50%));
+  transition: clip-path 0.08s linear;
+}
+
+.demo__wipe {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--compare, 50%);
+  width: 3px;
+  margin-left: -1px;
+  z-index: 4;
+  background: linear-gradient(180deg, transparent, var(--accent), transparent);
+  box-shadow: 0 0 20px color-mix(in srgb, var(--accent) 80%, transparent);
+  opacity: 0;
+  pointer-events: none;
+  transition: left 0.08s linear, opacity 0.3s ease;
+}
+
+.demo[data-has-result="true"] .demo__wipe,
+.demo[data-has-result="true"] .demo__handle {
+  opacity: 1;
+}
+
+.demo__handle {
+  position: absolute;
+  top: 50%;
+  left: var(--compare, 50%);
+  width: 28px;
+  height: 28px;
+  margin: -14px 0 0 -14px;
+  z-index: 5;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  background: var(--surface);
+  box-shadow: var(--shadow-glow);
+  opacity: 0;
+  pointer-events: none;
+  transition: left 0.08s linear, opacity 0.3s ease;
+}
+
+.demo__handle::before,
+.demo__handle::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  width: 0;
+  height: 0;
+  margin-top: -4px;
+  border: 4px solid transparent;
+}
+
+.demo__handle::before {
+  left: 4px;
+  border-right-color: var(--accent);
+}
+
+.demo__handle::after {
+  right: 4px;
+  border-left-color: var(--accent);
+}
+
+.demo__shimmer,
+.demo__scan {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+}
+
+.demo__stage[data-state="processing"] .demo__shimmer {
+  opacity: 1;
+  background: linear-gradient(
+    105deg,
+    transparent 35%,
+    color-mix(in srgb, var(--accent) 55%, transparent) 50%,
+    transparent 65%
+  );
+  background-size: 200% 100%;
+  animation: demo-shimmer 1.2s ease-in-out infinite;
+}
+
+.demo__stage[data-state="processing"] .demo__scan {
+  opacity: 1;
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    color-mix(in srgb, var(--phosphor) 35%, transparent) 48%,
+    transparent 100%
+  );
+  animation: demo-scan 1.4s ease-in-out infinite;
+}
+
+.demo__stage[data-state="processing"] .demo__img--before {
+  filter: saturate(0.85) contrast(1.05);
+  animation: demo-pulse 1.4s ease-in-out infinite;
+}
+
+.demo__stage[data-state="reveal"] .demo__layer--after {
+  animation: demo-reveal 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.demo__stage[data-state="reveal"] .demo__wipe {
+  animation: demo-wipe-line 0.85s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+@keyframes demo-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@keyframes demo-scan {
+  0%, 100% { transform: translateY(-100%); }
+  50% { transform: translateY(100%); }
+}
+
+@keyframes demo-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.82; }
+}
+
+@keyframes demo-reveal {
+  from { clip-path: inset(0 100% 0 0); }
+  to { clip-path: inset(0 0 0 var(--compare, 50%)); }
+}
+
+@keyframes demo-wipe-line {
+  from { left: 0; opacity: 1; }
+  to { left: var(--compare, 50%); opacity: 1; }
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(3px); }
+}
+
+.demo__compare {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: 0.65rem;
+  padding: 0.5rem 1rem 0;
+  margin: 0;
+}
+
+.demo__compare-label {
+  font-family: var(--font-mono);
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.demo__compare-range,
+.demo__threshold-range {
+  width: 100%;
+  accent-color: var(--accent);
+  height: 4px;
+  cursor: pointer;
+}
+
+.demo__controls {
+  display: grid;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  border-top: 1px solid var(--border);
+  background: color-mix(in srgb, var(--void) 35%, var(--surface));
+}
+
+.demo__control--threshold label {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  margin-bottom: 0.4rem;
+}
+
+.demo__invert {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.demo__invert input {
+  accent-color: var(--accent);
+  width: 1rem;
+  height: 1rem;
+}
+
+.demo__invert-hint {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.demo__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  padding: 0 1rem 0.75rem;
+  justify-content: center;
+}
+
+.demo__actions .btn {
+  flex: 1 1 auto;
+  min-width: 140px;
+}
+
+.demo__status {
+  min-height: 1.2em;
+}
+
+.cutout-preview__stage.demo__stage {
+  grid-template-columns: none;
+  padding: 0;
+}
+
+@media (max-width: 420px) {
+  .demo__actions .btn {
+    width: 100%;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .hero,
-  .cutout-preview {
+  .cutout-preview,
+  .demo {
     animation: none;
   }
   .btn:hover {
@@ -821,7 +1207,12 @@ a:focus-visible,
   .cutout-subject--cut,
   .cutout-preview__fill,
   .cutout-preview__thumb,
-  body.theme-cutout .bg-animation::after {
+  body.theme-cutout .bg-animation::after,
+  .demo__dropzone-icon,
+  .demo__stage[data-state="processing"] .demo__shimmer,
+  .demo__stage[data-state="processing"] .demo__scan,
+  .demo__stage[data-state="processing"] .demo__img--before,
+  .demo__stage[data-state="reveal"] .demo__layer--after {
     animation: none;
   }
 }

@@ -1,6 +1,12 @@
 {
   "framework": null,
   "buildCommand": "",
-  "installCommand": "",
-  "outputDirectory": "public"
+  "installCommand": "pip install -r requirements.txt",
+  "outputDirectory": "public",
+  "functions": {
+    "api/cutout.py": {
+      "maxDuration": 30,
+      "memory": 1024
+    }
+  }
 }
