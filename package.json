@@ -2,6 +2,7 @@
   "name": "threshold-background-cutout",
   "private": true,
   "dependencies": {
-    "sharp": "^0.33.5"
+    "jpeg-js": "^0.4.4",
+    "pngjs": "^7.0.0"
   }
 }
