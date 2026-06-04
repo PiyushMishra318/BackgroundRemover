@@ -23,134 +23,131 @@
     </button>
   </nav>
 
-  <header class="hero">
-    <p class="hero__kicker">C++ · Python · OpenCV</p>
-    <h1 class="hero__title"><span class="hero__title-accent">Threshold</span> Background Cutout</h1>
-    <p class="hero__tagline">Turn a flat-color backdrop into a clean alpha mask — one threshold, a BGRA PNG, and you&apos;re done.</p>
-    <div class="hero__actions">
-      <a class="btn btn-primary" href="#try-it">Try it live</a>
-      <a class="btn btn-secondary" href="https://github.com/PiyushMishra318/Threshold-Background-Cutout/releases/download/v2.0.0/bg-cutout-windows-x64.exe" id="exe-link">Download for Windows</a>
-      <a class="btn btn-secondary" href="https://github.com/PiyushMishra318/Threshold-Background-Cutout" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+  <header class="hero hero--threshold">
+    <div class="hero__lead">
+      <p class="hero__cli" aria-hidden="true"><span class="hero__prompt">$</span> bg-cutout-py -h</p>
+      <h1 class="hero__title">Grayscale threshold → <span class="hero__title-accent">alpha mask</span></h1>
+      <p class="hero__tagline">One luminance cutoff separates subject from backdrop. Ship a BGRA PNG from the browser lab or the C++/Python CLIs.</p>
+    </div>
+    <div class="hero__aside">
+      <ul class="hero__stack" aria-label="Toolchain">
+        <li><code>bg-cutout</code> C++ · OpenCV</li>
+        <li><code>bg-cutout-py</code> Python</li>
+        <li><span class="hero__stack-badge">BGRA PNG</span></li>
+      </ul>
+      <div class="hero__actions">
+        <a class="btn btn-primary" href="#workbench">Open threshold lab</a>
+        <a class="btn btn-secondary" href="https://github.com/PiyushMishra318/Threshold-Background-Cutout/releases/download/v2.0.0/bg-cutout-windows-x64.exe" id="exe-link">Windows .exe</a>
+        <a class="btn btn-secondary" href="https://github.com/PiyushMishra318/Threshold-Background-Cutout" target="_blank" rel="noopener noreferrer">GitHub</a>
+      </div>
     </div>
   </header>
 
-  <section id="try-it" class="demo cutout-preview" aria-labelledby="demo-heading" data-has-result="false">
-    <h2 id="demo-heading" class="demo__heading section-kicker">Try it live</h2>
-    <p class="demo__lede">Upload an image — the same OpenCV threshold pipeline as <code>bg-cutout-py</code> runs on the server and returns a BGRA PNG.</p>
+  <section id="workbench" class="workbench" aria-labelledby="workbench-heading" data-has-result="false">
+    <header class="workbench__header">
+      <h2 id="workbench-heading" class="workbench__title">Threshold lab</h2>
+      <p class="workbench__lede">Same OpenCV pipeline as <code>bg-cutout-py</code> — upload, set <strong>-t</strong>, optional <strong>--invert</strong>, download BGRA.</p>
+    </header>
 
-    <div class="demo__frame cutout-preview__frame">
-      <div class="cutout-preview__toolbar">
-        <span class="cutout-preview__dot" aria-hidden="true"></span>
-        <span class="cutout-preview__dot" aria-hidden="true"></span>
-        <span class="cutout-preview__dot" aria-hidden="true"></span>
-        <span class="cutout-preview__title">bg-cutout — live</span>
-        <span class="demo__filename" aria-live="polite">sample.jpg</span>
+    <div class="workbench__shell">
+      <div class="workbench__cli" aria-live="polite">
+        <span class="workbench__cli-prompt" aria-hidden="true">$</span>
+        <code id="workbench-cmd" class="workbench__cli-cmd">bg-cutout-py -i sample.jpg -o cutout.png -t 100</code>
       </div>
 
+      <div class="workbench__threshold-hero">
+        <div class="workbench__threshold-head">
+          <label for="demo-threshold" class="workbench__threshold-label">Threshold <span class="workbench__threshold-unit">0–255</span></label>
+          <output id="demo-threshold-value" class="workbench__threshold-num" for="demo-threshold">100</output>
+        </div>
+        <input type="range" id="demo-threshold" class="workbench__threshold-range" min="0" max="255" value="100" aria-valuemin="0" aria-valuemax="255" aria-valuenow="100" />
+        <div class="workbench__threshold-meter" aria-hidden="true">
+          <span class="workbench__meter-fill" id="demo-meter-fill" style="width: 39%"></span>
+          <span class="workbench__meter-cutoff" id="demo-meter-cutoff" style="left: 39%"></span>
+        </div>
+      </div>
+
+      <label class="workbench__invert">
+        <input type="checkbox" id="demo-invert" />
+        <span>Invert mask</span>
+        <span class="workbench__invert-hint">— <code>THRESH_BINARY_INV</code> for dark backdrops</span>
+      </label>
+
       <div
-        class="demo__dropzone"
+        class="workbench__dropzone"
         role="button"
         tabindex="0"
         aria-label="Drop an image here or activate to choose a file"
       >
-        <input type="file" id="demo-file" class="demo__file-input" accept="image/jpeg,image/png,image/webp" hidden />
-        <p class="demo__dropzone-text"><span class="demo__dropzone-icon" aria-hidden="true">↓</span> Drop image or click to browse</p>
-        <button type="button" class="demo__sample-btn" id="demo-sample">Use sample photo</button>
+        <input type="file" id="demo-file" class="workbench__file-input" accept="image/jpeg,image/png,image/webp" hidden />
+        <p class="workbench__dropzone-text"><span class="workbench__dropzone-glyph" aria-hidden="true">+</span> Drop image or click to browse</p>
+        <button type="button" class="workbench__sample-btn" id="demo-sample">Load sample.jpg</button>
       </div>
 
-      <div class="demo__stage cutout-preview__stage" data-state="idle" style="--compare: 50%">
-        <div class="demo__layer demo__layer--before">
-          <span class="cutout-panel__label">Before</span>
-          <div class="demo__viewport demo__viewport--screen">
-            <img class="demo__img demo__img--before" src="assets/sample.jpg" alt="Original image before background removal" width="320" height="400" />
-            <div class="demo__shimmer" aria-hidden="true"></div>
-            <div class="demo__scan" aria-hidden="true"></div>
+      <div class="workbench__panels" data-state="idle">
+        <article class="workbench__panel workbench__panel--bgr">
+          <header class="workbench__panel-head">
+            <span class="workbench__panel-tag">BGR</span>
+            <span class="workbench__panel-name" id="demo-filename">sample.jpg</span>
+          </header>
+          <div class="workbench__viewport workbench__viewport--screen">
+            <img class="workbench__img workbench__img--before" src="assets/sample.jpg" alt="Original image on green-screen metaphor" width="320" height="400" />
+            <div class="workbench__sweep" aria-hidden="true"></div>
+            <div class="workbench__matte" aria-hidden="true"></div>
           </div>
+        </article>
+
+        <div class="workbench__bridge" aria-hidden="true">
+          <span class="workbench__bridge-line"></span>
+          <span class="workbench__bridge-label">cv.threshold</span>
         </div>
-        <div class="demo__layer demo__layer--after" aria-hidden="true">
-          <span class="cutout-panel__label">After</span>
-          <div class="demo__viewport demo__viewport--alpha">
-            <img class="demo__img demo__img--after" alt="Cutout with transparent background" hidden />
+
+        <article class="workbench__panel workbench__panel--bgra">
+          <header class="workbench__panel-head">
+            <span class="workbench__panel-tag workbench__panel-tag--alpha">BGRA</span>
+            <span class="workbench__panel-name">alpha → PNG</span>
+          </header>
+          <div class="workbench__viewport workbench__viewport--alpha">
+            <img class="workbench__img workbench__img--after" alt="Cutout on checkerboard transparency" hidden />
+            <p class="workbench__placeholder" id="demo-placeholder">Run cutout to reveal checkerboard</p>
           </div>
-        </div>
-        <div class="demo__wipe" aria-hidden="true"></div>
-        <div class="demo__handle" aria-hidden="true"></div>
+        </article>
       </div>
 
-      <label class="demo__compare" for="demo-compare">
-        <span class="demo__compare-label">Compare</span>
-        <input type="range" id="demo-compare" class="demo__compare-range" min="0" max="100" value="50" disabled aria-valuemin="0" aria-valuemax="100" aria-valuenow="50" />
-      </label>
-
-      <div class="demo__controls">
-        <div class="demo__control demo__control--threshold">
-          <label for="demo-threshold">
-            <span class="cutout-preview__slider-label">Threshold</span>
-            <span class="cutout-preview__value" id="demo-threshold-value">100</span>
-          </label>
-          <input type="range" id="demo-threshold" class="demo__threshold-range" min="0" max="255" value="100" />
-        </div>
-        <label class="demo__invert">
-          <input type="checkbox" id="demo-invert" />
-          <span>Invert mask</span>
-          <span class="demo__invert-hint">(dark backgrounds)</span>
-        </label>
-      </div>
-
-      <div class="demo__actions">
-        <button type="button" class="btn btn-primary" id="demo-process">Cut out background</button>
+      <div class="workbench__actions">
+        <button type="button" class="btn btn-primary" id="demo-process">Run cutout</button>
         <button type="button" class="btn btn-secondary" id="demo-download" disabled>Download PNG</button>
       </div>
-      <p class="demo__status cutout-preview__caption" role="status">Loading sample…</p>
+      <p class="workbench__status" id="demo-status" role="status">Loading sample…</p>
     </div>
-    <p class="cutout-preview__caption">Grayscale threshold → alpha channel → transparent PNG · same algorithm as <code>bg-cutout-py</code></p>
   </section>
 
   <main class="page-main">
-    <section class="benefits" aria-labelledby="benefits-heading">
-      <h2 id="benefits-heading" class="section-kicker">Why Threshold</h2>
-      <ul class="benefit-strip">
-        <li class="benefit-strip__item">
-          <span class="benefit-strip__icon" aria-hidden="true">◐</span>
-          <strong>One knob, clear mask</strong>
-          <span>Pick a threshold 0–255; pixels above or below become your alpha — invert when the backdrop is dark.</span>
+    <section class="signal-path" aria-labelledby="signal-heading">
+      <h2 id="signal-heading" class="section-kicker">Signal path</h2>
+      <ol class="signal-path__list">
+        <li class="signal-path__step">
+          <span class="signal-path__n">01</span>
+          <div>
+            <strong>Decode BGR</strong>
+            <p>OpenCV loads channels; no ML — just luminance.</p>
+          </div>
         </li>
-        <li class="benefit-strip__item">
-          <span class="benefit-strip__icon" aria-hidden="true">⬡</span>
-          <strong>Windows build ready</strong>
-          <span>Grab <code>bg-cutout-windows-x64.exe</code> from Releases — no local OpenCV install required.</span>
+        <li class="signal-path__step">
+          <span class="signal-path__n">02</span>
+          <div>
+            <strong>Grayscale + threshold</strong>
+            <p>Binary mask at your cutoff; invert flips which side stays opaque.</p>
+          </div>
         </li>
-        <li class="benefit-strip__item">
-          <span class="benefit-strip__icon" aria-hidden="true">⇄</span>
-          <strong>Same pipeline, two CLIs</strong>
-          <span>Fast C++ binary or portable <code>bg-cutout-py</code> — identical BGRA PNG output.</span>
+        <li class="signal-path__step">
+          <span class="signal-path__n">03</span>
+          <div>
+            <strong>Merge alpha, write PNG</strong>
+            <p>BGRA with transparency for slides, thumbnails, compositing.</p>
+          </div>
         </li>
-      </ul>
-    </section>
-
-    <section class="moments" aria-labelledby="moments-heading">
-      <h2 id="moments-heading" class="section-kicker">How it works</h2>
-      <article class="moment">
-        <div class="moment__copy">
-          <h3>Load, grayscale, threshold</h3>
-          <p>OpenCV reads your image, converts to grayscale, and applies a binary threshold to build the alpha mask.</p>
-        </div>
-        <div class="moment__visual moment__visual--pipeline" aria-hidden="true">
-          <span class="pipe-step"><em>1</em> BGR image</span>
-          <span class="pipe-step pipe-step--active"><em>2</em> Grayscale + threshold</span>
-          <span class="pipe-step"><em>3</em> Alpha mask</span>
-        </div>
-      </article>
-      <article class="moment moment--reverse">
-        <div class="moment__copy">
-          <h3>Export BGRA with transparency</h3>
-          <p>Blue, green, red, and alpha merge into a PNG you can drop into slides, thumbnails, or compositing workflows.</p>
-        </div>
-        <div class="moment__visual moment__visual--terminal" aria-hidden="true">
-          <code class="term-line">bg-cutout input.jpg out.png -t 240</code>
-          <code class="term-line term-line--muted">bg-cutout-py -i photo.jpg -o cut.png --invert</code>
-        </div>
-      </article>
+      </ol>
     </section>
 
     <section class="install" aria-labelledby="install-heading">
@@ -165,11 +162,11 @@
     </section>
 
     <section class="usage" aria-labelledby="usage-heading">
-      <h2 id="usage-heading" class="section-kicker">Usage</h2>
+      <h2 id="usage-heading" class="section-kicker">CLI reference</h2>
       <div class="usage__card">
         <pre class="usage__pre"><code>bg-cutout-windows-x64.exe input.jpg output.png --threshold 240
-bg-cutout-py input.jpg output.png --threshold 240</code></pre>
-        <p class="usage__note">Build C++ with CMake, or <code>pip install -e .</code> for the Python entry point. See the repo README for flags like <code>--invert</code> and <code>--preview</code>.</p>
+bg-cutout-py input.jpg output.png --threshold 240 --invert</code></pre>
+        <p class="usage__note">Build C++ with CMake, or <code>pip install -e .</code> for the Python entry point. See the repo README for <code>--preview</code> and other flags.</p>
       </div>
     </section>
   </main>

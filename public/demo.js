@@ -3,30 +3,33 @@
 
   var API = "/api/cutout";
   var SAMPLE = "assets/sample.jpg";
-  var DEFAULT_THRESHOLD = 100;
   var MAX_FILE_BYTES = 10 * 1024 * 1024;
 
-  var root = document.getElementById("try-it");
+  var root = document.getElementById("workbench");
   if (!root) return;
 
-  var dropzone = root.querySelector(".demo__dropzone");
+  var dropzone = root.querySelector(".workbench__dropzone");
   var fileInput = root.querySelector("#demo-file");
-  var stage = root.querySelector(".demo__stage");
-  var beforeImg = root.querySelector(".demo__img--before");
-  var afterImg = root.querySelector(".demo__img--after");
-  var compareRange = root.querySelector("#demo-compare");
+  var panels = root.querySelector(".workbench__panels");
+  var beforeImg = root.querySelector(".workbench__img--before");
+  var afterImg = root.querySelector(".workbench__img--after");
+  var placeholder = root.querySelector("#demo-placeholder");
   var thresholdInput = root.querySelector("#demo-threshold");
   var thresholdValue = root.querySelector("#demo-threshold-value");
+  var meterFill = root.querySelector("#demo-meter-fill");
+  var meterCutoff = root.querySelector("#demo-meter-cutoff");
+  var cmdEl = root.querySelector("#workbench-cmd");
   var invertInput = root.querySelector("#demo-invert");
   var processBtn = root.querySelector("#demo-process");
   var downloadBtn = root.querySelector("#demo-download");
-  var statusEl = root.querySelector(".demo__status");
-  var filenameEl = root.querySelector(".demo__filename");
+  var statusEl = root.querySelector("#demo-status");
+  var filenameEl = root.querySelector("#demo-filename");
   var useSampleBtn = root.querySelector("#demo-sample");
 
   var state = {
     sourceUrl: null,
     sourceFile: null,
+    sourceName: "sample.jpg",
     resultBlob: null,
     busy: false,
     objectUrls: [],
@@ -44,15 +47,38 @@
     return url;
   }
 
-  function setStatus(msg, live) {
-    if (!statusEl) return;
-    statusEl.textContent = msg;
-    if (live) statusEl.setAttribute("aria-live", "polite");
+  function setStatus(msg) {
+    if (statusEl) statusEl.textContent = msg;
   }
 
-  function setStageMode(mode) {
-    stage.dataset.state = mode;
-    root.dataset.hasResult = mode === "done" || mode === "reveal" ? "true" : "false";
+  function setPanelState(mode) {
+    panels.dataset.state = mode;
+    root.dataset.hasResult = mode === "done" || mode === "signal" ? "true" : "false";
+  }
+
+  function thresholdPct() {
+    return (parseInt(thresholdInput.value, 10) / 255) * 100;
+  }
+
+  function syncThresholdUi() {
+    var t = thresholdInput.value;
+    var pct = thresholdPct();
+    thresholdValue.textContent = t;
+    thresholdValue.value = t;
+    thresholdInput.setAttribute("aria-valuenow", t);
+    if (meterFill) meterFill.style.width = pct + "%";
+    if (meterCutoff) meterCutoff.style.left = pct + "%";
+    panels.style.setProperty("--threshold-pct", pct + "%");
+    updateCli();
+  }
+
+  function updateCli() {
+    if (!cmdEl) return;
+    var name = state.sourceName || "input.jpg";
+    var t = thresholdInput.value;
+    var inv = invertInput.checked ? " --invert" : "";
+    cmdEl.textContent =
+      "bg-cutout-py -i " + name + " -o cutout.png -t " + t + inv;
   }
 
   function readFileAsDataUrl(file) {
@@ -80,17 +106,17 @@
   function applySource(url, label) {
     revokeAll();
     state.sourceUrl = url;
+    state.sourceName = label || "input.jpg";
     state.resultBlob = null;
     beforeImg.src = url;
     afterImg.removeAttribute("src");
     afterImg.hidden = true;
+    if (placeholder) placeholder.hidden = false;
     downloadBtn.disabled = true;
-    compareRange.disabled = true;
-    compareRange.value = "50";
-    stage.style.setProperty("--compare", "50%");
-    setStageMode("idle");
-    if (filenameEl) filenameEl.textContent = label || "Image loaded";
-    setStatus("Adjust threshold, then cut out the background.", true);
+    setPanelState("idle");
+    if (filenameEl) filenameEl.textContent = state.sourceName;
+    updateCli();
+    setStatus("Set threshold, then run cutout.");
   }
 
   function fileToBase64(dataUrl) {
@@ -129,8 +155,8 @@
     state.busy = true;
     processBtn.disabled = true;
     fileInput.disabled = true;
-    setStageMode("processing");
-    setStatus("Thresholding grayscale and building alpha mask…", true);
+    setPanelState("matting");
+    setStatus("cv.cvtColor → cv.threshold → BGRA…");
 
     try {
       var dataUrl;
@@ -149,26 +175,25 @@
       var threshold = parseInt(thresholdInput.value, 10);
       var invert = invertInput.checked;
 
-      var minAnim = delay(1400);
+      var minAnim = delay(1200);
       var cutout = fetchCutout(fileToBase64(dataUrl), threshold, invert);
       var results = await Promise.all([minAnim, cutout]);
-      var blob = results[1];
+      var resultBlob = results[1];
 
-      state.resultBlob = blob;
-      var resultUrl = trackUrl(URL.createObjectURL(blob));
+      state.resultBlob = resultBlob;
+      var resultUrl = trackUrl(URL.createObjectURL(resultBlob));
       afterImg.src = resultUrl;
       afterImg.hidden = false;
-      root.querySelector(".demo__layer--after").removeAttribute("aria-hidden");
+      if (placeholder) placeholder.hidden = true;
 
-      setStageMode("reveal");
-      setStatus("Reveal complete — drag the slider to compare.", true);
-      await delay(900);
-      setStageMode("done");
+      setPanelState("signal");
+      setStatus("Mask locked — download BGRA or tweak threshold and re-run.");
+      await delay(700);
+      setPanelState("done");
       downloadBtn.disabled = false;
-      compareRange.disabled = false;
     } catch (err) {
-      setStageMode("idle");
-      setStatus(err.message || "Processing failed. Try again or use a smaller image.", true);
+      setPanelState("idle");
+      setStatus(err.message || "Processing failed. Try a smaller image.");
     } finally {
       state.busy = false;
       processBtn.disabled = !state.sourceUrl;
@@ -178,11 +203,11 @@
 
   function onFile(file) {
     if (!file || !file.type.startsWith("image/")) {
-      setStatus("Please choose a JPEG or PNG image.", true);
+      setStatus("Choose a JPEG, PNG, or WebP image.");
       return;
     }
     if (file.size > MAX_FILE_BYTES) {
-      setStatus("Image must be under 10 MB.", true);
+      setStatus("Image must be under 10 MB.");
       return;
     }
     state.sourceFile = file;
@@ -192,17 +217,17 @@
 
   function onDrop(e) {
     e.preventDefault();
-    dropzone.classList.remove("demo__dropzone--hover");
+    dropzone.classList.remove("workbench__dropzone--hover");
     var file = e.dataTransfer && e.dataTransfer.files[0];
     onFile(file);
   }
 
   dropzone.addEventListener("dragover", function (e) {
     e.preventDefault();
-    dropzone.classList.add("demo__dropzone--hover");
+    dropzone.classList.add("workbench__dropzone--hover");
   });
   dropzone.addEventListener("dragleave", function () {
-    dropzone.classList.remove("demo__dropzone--hover");
+    dropzone.classList.remove("workbench__dropzone--hover");
   });
   dropzone.addEventListener("drop", onDrop);
 
@@ -222,23 +247,17 @@
     if (fileInput.files[0]) onFile(fileInput.files[0]);
   });
 
-  thresholdInput.addEventListener("input", function () {
-    thresholdValue.textContent = thresholdInput.value;
+  thresholdInput.addEventListener("input", syncThresholdUi);
+  thresholdInput.addEventListener("change", function () {
+    if (state.resultBlob) setStatus("Threshold changed — run cutout again.");
   });
 
-  compareRange.addEventListener("input", function () {
-    var v = compareRange.value;
-    stage.style.setProperty("--compare", v + "%");
-    compareRange.setAttribute("aria-valuenow", v);
+  invertInput.addEventListener("change", function () {
+    syncThresholdUi();
+    if (state.resultBlob) setStatus("Invert toggled — run cutout again.");
   });
 
   processBtn.addEventListener("click", runProcess);
-  invertInput.addEventListener("change", function () {
-    if (state.resultBlob) setStatus("Settings changed — run cutout again.", true);
-  });
-  thresholdInput.addEventListener("change", function () {
-    if (state.resultBlob) setStatus("Threshold changed — run cutout again.", true);
-  });
 
   downloadBtn.addEventListener("click", function () {
     if (!state.resultBlob) return;
@@ -252,13 +271,13 @@
     state.sourceFile = null;
     applySource(SAMPLE, "sample.jpg");
     loadImageUrl(SAMPLE).catch(function () {
-      setStatus("Could not load sample image.", true);
+      setStatus("Could not load sample image.");
     });
   });
 
-  thresholdValue.textContent = thresholdInput.value;
+  syncThresholdUi();
   applySource(SAMPLE, "sample.jpg");
   loadImageUrl(SAMPLE).then(function () {
-    setStatus("Sample loaded — tweak threshold and cut out.", true);
+    setStatus("Sample loaded — adjust threshold and run cutout.");
   });
 })();
